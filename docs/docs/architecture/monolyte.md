@@ -10,7 +10,8 @@
 
 title System Context Diagram - Управление отоплением
 
-Person(user, "Пользователь", "Пользователь ")
+Person(user, "Пользователь", "Пользователь системы")
+Person(user, "Датчики", "Умные устройства", $sprite="robots")
 
 rectangle Монолитное_Приложение as Application {
 [Управление отоплением] as HeatingControl
