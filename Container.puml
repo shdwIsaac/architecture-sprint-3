@@ -1,0 +1,56 @@
+@startuml
+title FitLife Container Diagram
+
+left to right direction
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user, "User", "")
+Person(admin, "Administrator", "")
+System(CompensationSystem, "Compensation System", "System managing memberships, schedules, and payments")
+System(AdminFront, "AdminFront System", "System managing memberships, schedules, and payments")
+System(Front, "Front System", "System managing memberships, schedules, and payments")
+
+Container_Boundary(CompensationSystem, "Compensation System") {
+  Container(CompensationService, "CompensationService", "C#", "Handles user interactions")
+  Container(BudgetService, "BudgetService", "C#", "Allows users to manage their membership")
+  Container(ProhibitionService, "ProhibitionService", "C#", "Processes payments")
+  Container(CompensationRdmService, "CompensationRdmService", "C#", "Stores user data and schedules")
+  Container(CompensationMonetary, "CompensationMonetary", "C#", "Processes payments")
+  Container(CompensationPromoCode, "CompensationPromoCode", "C#", "Stores user data and schedules")
+  Container(MarginService, "MarginService", "C#", "Stores user data and schedules")
+}
+
+Container_Boundary(Kafka, "Compensation System") {
+  queue "CRM.PERFORM.MonetaryCompensation" as PERFORMMonetaryCompensation
+}
+
+System_Ext(apiBercut, "Bercut", "External API for fitness data integration")
+System_Ext(apiHachapuri, "Hachapuri", "External API for fitness data integration")
+System_Ext(apiWS, "WD/WS", "External API for fitness data integration")
+System_Ext(apiBercutSubs, "BercutSubscriptionService", "External API for fitness data integration")
+System_Ext(PersonalInfoService, "PersonalInfoService", "External API for fitness data integration")
+System_Ext(FinanceService, "FinanceService", "External API for fitness data integration")
+System_Ext(PromoCodeService, "PromoCodeService", "External API for fitness data integration")
+System_Ext(SubscriptionService, "SubscriptionService", "External API for fitness data integration")
+
+Rel(user, Front, "Uses the system")
+Rel(admin, AdminFront,"Manages the system")
+Rel(PERFORMMonetaryCompensation, CompensationMonetary,"Manages the system")
+Rel(CompensationService, PERFORMMonetaryCompensation,"Manages the system")
+Rel(AdminFront, CompensationRdmService,"Manages the system")
+Rel(CompensationService,BudgetService,"Processes payment requests")
+Rel(CompensationService,ProhibitionService,"Processes payment requests")
+Rel(CompensationService,CompensationRdmService,"Processes payment requests")
+Rel(CompensationService,CompensationMonetary,"Processes payment requests")
+Rel(CompensationService,CompensationPromoCode,"Processes payment requests")
+Rel(CompensationSystem,FinanceService,"Processes payment requests")
+Rel(CompensationSystem,PromoCodeService,"Processes payment requests")
+Rel(CompensationSystem,PersonalInfoService,"Processes payment requests")
+Rel(CompensationSystem,SubscriptionService,"Processes payment requests")
+Rel(CompensationService,MarginService,"Processes payment requests")
+Rel(apiWS, CompensationSystem, "Uses the system")
+Rel(apiHachapuri, CompensationSystem, "Uses the system")
+Rel(CompensationSystem,apiBercut, "Uses the system")
+Rel(CompensationSystem,apiBercutSubs , "Uses the system")
+Rel(Front, CompensationSystem, "Uses the system")
+@enduml
