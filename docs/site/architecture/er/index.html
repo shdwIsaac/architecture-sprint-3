@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Er - FitLife Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Er";
+        var mkdocs_page_input_path = "architecture\\er.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> FitLife Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Welcome to MkDocs</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Architecture</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../api/">Api</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Er</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../microservice/">Microservice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monolyte/">Monolyte</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">FitLife Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Architecture</li>
+      <li class="breadcrumb-item active">Er</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="1">1. Идентификация сущностей</h2>
+<ul>
+<li>Пользователь (User):
+Описывает учетную запись пользователя, который может управлять устройствами в одном или нескольких домах.</li>
+<li>Дом (House):
+Описывает объект (дом или помещение), в котором расположены устройства, управляемые пользователем.</li>
+<li>Устройство (Device):
+Описывает физическое устройство отопления или датчик температуры, установленное в доме.</li>
+<li>Тип устройства (DeviceType):
+Описывает характеристики типа устройства, например, термостат, котел или датчик температуры.</li>
+<li>Модуль (Module):
+Описывает компоненты устройства (например, блок управления или модуль измерения температуры), которые могут передавать данные и управляться системой.</li>
+<li>Телеметрия (TelemetryData):
+Описывает данные, получаемые от устройств, такие как текущая температура, состояние устройства и прочее.</li>
+</ul>
+<h2 id="2">2. Определение атрибутов</h2>
+<h3 id="user">Пользователь (User):</h3>
+<ul>
+<li>id: уникальный идентификатор пользователя.</li>
+<li>name: имя пользователя.</li>
+<li>email: электронная почта пользователя.</li>
+<li>password_hash: хэш пароля.</li>
+<li>created_at: дата создания учетной записи.</li>
+</ul>
+<h3 id="house">Дом (House):</h3>
+<ul>
+<li>id: уникальный идентификатор дома.</li>
+<li>user_id: идентификатор пользователя (внешний ключ).</li>
+<li>address: адрес дома.</li>
+<li>created_at: дата добавления дома.</li>
+<li>
+<p>Устройство (Device):</p>
+</li>
+<li>
+<p>id: уникальный идентификатор устройства.</p>
+</li>
+<li>type_id: идентификатор типа устройства (внешний ключ к DeviceType).</li>
+<li>house_id: идентификатор дома (внешний ключ к House).</li>
+<li>serial_number: серийный номер устройства.</li>
+<li>status: текущее состояние устройства (включено/выключено).</li>
+<li>created_at: дата установки устройства.</li>
+</ul>
+<h3 id="devicetype">Тип устройства (DeviceType):</h3>
+<ul>
+<li>id: уникальный идентификатор типа устройства.</li>
+<li>name: название типа устройства (например, термостат, датчик температуры).</li>
+<li>description: описание типа устройства.</li>
+</ul>
+<h3 id="module">Модуль (Module):</h3>
+<ul>
+<li>id: уникальный идентификатор модуля.</li>
+<li>device_id: идентификатор устройства (внешний ключ).</li>
+<li>module_type: тип модуля (например, управление или датчик).</li>
+<li>status: текущее состояние модуля (активен/неактивен).</li>
+<li>created_at: дата добавления модуля.</li>
+</ul>
+<h3 id="telemetrydata">Телеметрия (TelemetryData):</h3>
+<ul>
+<li>id: уникальный идентификатор записи телеметрии.</li>
+<li>device_id: идентификатор устройства (внешний ключ).</li>
+<li>module_id: идентификатор модуля (внешний ключ).</li>
+<li>temperature: измеренная температура.</li>
+<li>timestamp: время записи телеметрии.</li>
+</ul>
+<h2 id="3">3. Описание связей</h2>
+<ul>
+<li>Пользователь — Дом: один пользователь может иметь несколько домов, но каждый дом связан только с одним пользователем (один ко многим).</li>
+<li>Дом — Устройство: один дом может содержать несколько устройств, каждое устройство принадлежит только одному дому (один ко многим).</li>
+<li>Устройство — Модуль: каждое устройство может иметь несколько модулей (например, блок управления и датчики) (один ко многим).</li>
+<li>Устройство — Телеметрия: одно устройство может генерировать множество записей телеметрии (один ко многим).</li>
+<li>Модуль — Телеметрия: один модуль может генерировать множество записей телеметрии (один ко многим).</li>
+<li>Тип устройства — Устройство: один тип устройства может применяться к нескольким устройствам (один ко многим).</li>
+</ul>
+<h2 id="4-er-">4. Построение ER-диаграммы</h2>
+<div class="puml"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="969px" preserveAspectRatio="true" style="background: #ffffff" version="1.1" viewBox="0 0 468 969" width="468px" zoomAndPan="magnify"><defs/><g><g id="elem_user"><rect codeLine="1" fill="#F1F1F1" height="129.4844" id="user" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="182.3838" x="7" y="7"/><ellipse cx="22" cy="23" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M26.1094,29 L18.3906,29 L18.3906,16.6094 L26.1094,16.6094 L26.1094,18.7656 L20.8438,18.7656 L20.8438,21.4375 L25.6094,21.4375 L25.6094,23.5938 L20.8438,23.5938 L20.8438,26.8438 L26.1094,26.8438 L26.1094,29 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="150.3838" x="36" y="27.8467">Пользователь (User)</text><line style="stroke:#181818;stroke-width:0.5;" x1="8" x2="188.3838" y1="39" y2="39"/><ellipse cx="18" cy="52.6484" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="27" y="55.9951">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="8" x2="188.3838" y1="63.2969" y2="63.2969"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95.1016" x="13" y="80.292">name : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94.0078" x="13" y="96.5889">email : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="162.7295" x="13" y="112.8857">password_hash : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="156.4746" x="13" y="129.1826">created_at : DateTime</text></g><g id="elem_house"><rect codeLine="10" fill="#F1F1F1" height="113.1875" id="house" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="168.4746" x="13.95" y="213.48"/><ellipse cx="50.1734" cy="229.48" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M54.2828,235.48 L46.564,235.48 L46.564,223.0894 L54.2828,223.0894 L54.2828,225.2456 L49.0171,225.2456 L49.0171,227.9175 L53.7828,227.9175 L53.7828,230.0737 L49.0171,230.0737 L49.0171,233.3237 L54.2828,233.3237 L54.2828,235.48 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="89.3115" x="68.8897" y="234.3267">Дом (House)</text><line style="stroke:#181818;stroke-width:0.5;" x1="14.95" x2="181.4246" y1="245.48" y2="245.48"/><ellipse cx="24.95" cy="259.1284" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="33.95" y="262.4751">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="14.95" x2="181.4246" y1="269.7769" y2="269.7769"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94.1445" x="19.95" y="286.772">user_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="110.708" x="19.95" y="303.0689">address : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="156.4746" x="19.95" y="319.3657">created_at : DateTime</text></g><g id="elem_device"><rect codeLine="18" fill="#F1F1F1" height="145.7813" id="device" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="178.8564" x="157.76" y="403.67"/><ellipse cx="172.76" cy="419.67" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M176.8694,425.67 L169.1506,425.67 L169.1506,413.2794 L176.8694,413.2794 L176.8694,415.4356 L171.6038,415.4356 L171.6038,418.1075 L176.3694,418.1075 L176.3694,420.2637 L171.6038,420.2637 L171.6038,423.5137 L176.8694,423.5137 L176.8694,425.67 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="146.8564" x="186.76" y="424.5167">Устройство (Device)</text><line style="stroke:#181818;stroke-width:0.5;" x1="158.76" x2="335.6164" y1="435.67" y2="435.67"/><ellipse cx="168.76" cy="449.3184" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="177.76" y="452.6651">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="158.76" x2="335.6164" y1="459.9669" y2="459.9669"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="94.8828" x="163.76" y="476.962">type_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="105.8271" x="163.76" y="493.2589">house_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="155.0596" x="163.76" y="509.5557">serial_number : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="98.417" x="163.76" y="525.8526">status : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="156.4746" x="163.76" y="542.1495">created_at : DateTime</text></g><g id="elem_devicetype"><rect codeLine="28" fill="#F1F1F1" height="96.8906" id="devicetype" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="244.2148" x="217.08" y="221.63"/><ellipse cx="232.08" cy="237.63" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M236.1894,243.63 L228.4706,243.63 L228.4706,231.2394 L236.1894,231.2394 L236.1894,233.3956 L230.9238,233.3956 L230.9238,236.0675 L235.6894,236.0675 L235.6894,238.2238 L230.9238,238.2238 L230.9238,241.4738 L236.1894,241.4738 L236.1894,243.63 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="212.2148" x="246.08" y="242.4767">Тип устройства (DeviceType)</text><line style="stroke:#181818;stroke-width:0.5;" x1="218.08" x2="460.2948" y1="253.63" y2="253.63"/><ellipse cx="228.08" cy="267.2784" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="237.08" y="270.6251">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="218.08" x2="460.2948" y1="277.9269" y2="277.9269"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="95.1016" x="223.08" y="294.922">name : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="133.2393" x="223.08" y="311.2189">description : String</text></g><g id="elem_module"><rect codeLine="35" fill="#F1F1F1" height="129.4844" id="module" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="168.4746" x="85.95" y="626.45"/><ellipse cx="107.4231" cy="642.45" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M111.5325,648.45 L103.8138,648.45 L103.8138,636.0594 L111.5325,636.0594 L111.5325,638.2156 L106.2669,638.2156 L106.2669,640.8875 L111.0325,640.8875 L111.0325,643.0437 L106.2669,643.0437 L106.2669,646.2937 L111.5325,646.2937 L111.5325,648.45 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="122.0898" x="122.8616" y="647.2967">Модуль (Module)</text><line style="stroke:#181818;stroke-width:0.5;" x1="86.95" x2="253.4246" y1="658.45" y2="658.45"/><ellipse cx="96.95" cy="672.0984" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="105.95" y="675.4451">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="86.95" x2="253.4246" y1="682.7469" y2="682.7469"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109.5938" x="91.95" y="699.742">device_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="146.1387" x="91.95" y="716.0389">module_type : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="98.417" x="91.95" y="732.3357">status : String</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="156.4746" x="91.95" y="748.6326">created_at : DateTime</text></g><g id="elem_telemetry"><rect codeLine="44" fill="#F1F1F1" height="129.4844" id="telemetry" rx="2.5" ry="2.5" style="stroke:#181818;stroke-width:0.5;" width="240.7148" x="126.83" y="832.94"/><ellipse cx="141.83" cy="848.94" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M145.9394,854.94 L138.2206,854.94 L138.2206,842.5494 L145.9394,842.5494 L145.9394,844.7056 L140.6737,844.7056 L140.6737,847.3775 L145.4394,847.3775 L145.4394,849.5337 L140.6737,849.5337 L140.6737,852.7837 L145.9394,852.7837 L145.9394,854.94 Z " fill="#000000"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="208.7148" x="155.83" y="853.7867">Телеметрия (TelemetryData)</text><line style="stroke:#181818;stroke-width:0.5;" x1="127.83" x2="366.5448" y1="864.94" y2="864.94"/><ellipse cx="137.83" cy="878.5884" fill="#000000" rx="3" ry="3" style="stroke:#000000;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="56.6084" x="146.83" y="881.9351">id : long</text><line style="stroke:#181818;stroke-width:1.0;" x1="127.83" x2="366.5448" y1="889.2369" y2="889.2369"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="109.5938" x="132.83" y="906.232">device_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="116.0742" x="132.83" y="922.5289">module_id : long</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="136.5" x="132.83" y="938.8257">temperature : Float</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="157.2881" x="132.83" y="955.1226">timestamp : DateTime</text></g><g id="link_user_house"><path codeLine="53" d="M98.19,144.76 C98.19,169.38 98.19,171.27 98.19,195.07 " fill="none" id="user-house" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="94.19" x2="102.19" y1="140.76" y2="140.76"/><line style="stroke:#181818;stroke-width:1.0;" x1="94.19" x2="102.19" y1="143.76" y2="143.76"/><line style="stroke:#181818;stroke-width:1.0;" x1="98.19" x2="98.19" y1="144.76" y2="136.76"/><line style="stroke:#181818;stroke-width:1.0;" x1="98.19" x2="104.19" y1="205.07" y2="213.07"/><line style="stroke:#181818;stroke-width:1.0;" x1="98.19" x2="92.19" y1="205.07" y2="213.07"/><line style="stroke:#181818;stroke-width:1.0;" x1="98.19" x2="98.19" y1="205.07" y2="213.07"/><ellipse cx="98.19" cy="199.07" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="99.19" y="179.5469">1 ко многим</text></g><g id="link_house_device"><path codeLine="54" d="M143.6203,333.4163 C160.7603,356.9463 165.6298,363.6223 183.8898,388.6823 " fill="none" id="house-device" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="138.032" x2="144.4983" y1="332.5383" y2="327.828"/><line style="stroke:#181818;stroke-width:1.0;" x1="139.7983" x2="146.2647" y1="334.9632" y2="330.2529"/><line style="stroke:#181818;stroke-width:1.0;" x1="143.6203" x2="138.91" y1="333.4163" y2="326.95"/><line style="stroke:#181818;stroke-width:1.0;" x1="189.7788" x2="199.3392" y1="396.7644" y2="399.6966"/><line style="stroke:#181818;stroke-width:1.0;" x1="189.7788" x2="189.6408" y1="396.7644" y2="406.7634"/><line style="stroke:#181818;stroke-width:1.0;" x1="189.7788" x2="194.49" y1="396.7644" y2="403.23"/><ellipse cx="186.2454" cy="391.9151" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="174.19" y="369.7369">1 ко многим</text></g><g id="link_device_module"><path codeLine="55" d="M218.2936,557.3711 C209.3036,582.1711 208.1765,585.2847 199.4565,609.3747 " fill="none" id="device-module" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="215.8963" x2="223.4173" y1="552.2473" y2="554.9737"/><line style="stroke:#181818;stroke-width:1.0;" x1="214.8739" x2="222.3949" y1="555.0678" y2="557.7941"/><line style="stroke:#181818;stroke-width:1.0;" x1="218.2936" x2="221.02" y1="557.3711" y2="549.85"/><line style="stroke:#181818;stroke-width:1.0;" x1="196.0529" x2="198.9718" y1="618.7776" y2="628.3422"/><line style="stroke:#181818;stroke-width:1.0;" x1="196.0529" x2="187.6882" y1="618.7776" y2="624.2578"/><line style="stroke:#181818;stroke-width:1.0;" x1="196.0529" x2="193.33" y1="618.7776" y2="626.3"/><ellipse cx="198.0951" cy="613.1359" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="210.19" y="592.5169">1 ко многим</text></g><g id="link_devicetype_device"><path codeLine="56" d="M314.3378,326.3157 C303.0278,351.4557 299.6066,359.0654 287.0066,387.0654 " fill="none" id="devicetype-device" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="312.3311" x2="319.6268" y1="321.0268" y2="324.3089"/><line style="stroke:#181818;stroke-width:1.0;" x1="311.1002" x2="318.3959" y1="323.7626" y2="327.0448"/><line style="stroke:#181818;stroke-width:1.0;" x1="314.3378" x2="317.62" y1="326.3157" y2="319.02"/><line style="stroke:#181818;stroke-width:1.0;" x1="282.9029" x2="285.0915" y1="396.1846" y2="405.9422"/><line style="stroke:#181818;stroke-width:1.0;" x1="282.9029" x2="274.1485" y1="396.1846" y2="401.0178"/><line style="stroke:#181818;stroke-width:1.0;" x1="282.9029" x2="279.62" y1="396.1846" y2="403.48"/><ellipse cx="285.3651" cy="390.7131" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="299.19" y="369.7369">1 ко многим</text></g><g id="link_device_telemetry"><path codeLine="57" d="M294.934,557.1183 C299.244,566.7983 299.68,569.51 302.19,579.45 C326.52,675.75 328.23,707.08 302.19,802.94 C299.47,812.95 303.3692,806.8601 298.6192,816.4501 " fill="none" id="device-telemetry" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="289.6528" x2="296.9612" y1="555.0912" y2="551.8372"/><line style="stroke:#181818;stroke-width:1.0;" x1="290.8731" x2="298.1814" y1="557.8318" y2="554.5778"/><line style="stroke:#181818;stroke-width:1.0;" x1="294.934" x2="291.68" y1="557.1183" y2="549.81"/><line style="stroke:#181818;stroke-width:1.0;" x1="294.1808" x2="296.0066" y1="825.4112" y2="835.2431"/><line style="stroke:#181818;stroke-width:1.0;" x1="294.1808" x2="285.2534" y1="825.4112" y2="829.9169"/><line style="stroke:#181818;stroke-width:1.0;" x1="294.1808" x2="290.63" y1="825.4112" y2="832.58"/><ellipse cx="296.8439" cy="820.0346" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="321.19" y="695.7569">1 ко многим</text></g><g id="link_module_telemetry"><path codeLine="58" d="M197.1611,763.8161 C206.3411,788.1761 207.614,791.5858 216.784,815.9258 " fill="none" id="module-telemetry" style="stroke:#181818;stroke-width:1.0;"/><line style="stroke:#181818;stroke-width:1.0;" x1="192.0075" x2="199.4936" y1="761.4836" y2="758.6625"/><line style="stroke:#181818;stroke-width:1.0;" x1="193.0654" x2="200.5515" y1="764.2909" y2="761.4698"/><line style="stroke:#181818;stroke-width:1.0;" x1="197.1611" x2="194.34" y1="763.8161" y2="756.33"/><line style="stroke:#181818;stroke-width:1.0;" x1="220.3096" x2="228.7447" y1="825.2837" y2="830.6547"/><line style="stroke:#181818;stroke-width:1.0;" x1="220.3096" x2="217.5153" y1="825.2837" y2="834.8853"/><line style="stroke:#181818;stroke-width:1.0;" x1="220.3096" x2="223.13" y1="825.2837" y2="832.77"/><ellipse cx="218.1942" cy="819.6689" fill="none" rx="4" ry="4" style="stroke:#181818;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="13" lengthAdjust="spacing" textLength="83.6875" x="212.19" y="799.0069">1 ко многим</text></g></g></svg></div>
+<h2 id="5-er-">5. Описание ER-диаграммы</h2>
+<ul>
+<li>Пользователь (User) может иметь несколько домов (один ко многим).</li>
+<li>Дом (House) может содержать несколько устройств (один ко многим).</li>
+<li>Устройство (Device) может быть связано с несколькими модулями и генерировать записи телеметрии (один ко многим).</li>
+<li>Тип устройства (DeviceType) описывает характеристики устройств и связывается с ними (один ко многим).</li>
+<li>Модуль (Module) связан с устройством и может передавать данные в телеметрию (один ко многим).</li>
+<li>Телеметрия (TelemetryData) хранит данные, получаемые от устройств и их модулей (один ко многим).</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../api/" class="btn btn-neutral float-left" title="Api"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../microservice/" class="btn btn-neutral float-right" title="Microservice">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../api/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../microservice/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

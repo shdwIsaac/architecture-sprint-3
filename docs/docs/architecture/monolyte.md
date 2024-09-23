@@ -5,30 +5,23 @@
 !include C4_Context.puml
 !include C4_Container.puml
 
-!define RECTANGLE "rect"
-!define SYSTEM "system"
-
 title System Context Diagram - Управление отоплением
 
 Person(user, "Пользователь", "Пользователь системы")
-Person(user, "Датчики", "Умные устройства", $sprite="robots")
+Person(iot, "Датчики", "Умные устройства", $sprite="robots")
 
-rectangle Монолитное_Приложение as Application {
-[Управление отоплением] as HeatingControl
-[Мониторинг температуры] as TempMonitoring
-database "PostgreSQL База данных" as DB
+
+Container_Boundary(HeatingControlMonolyte, "Управление отоплением - монолит") {
+  Container(HeatingControl, "Управление отоплением", "Java", "Управлять отоплением в доме")
+  Container(TempMonitoring, "Мониторинг температуры", "Java", "Проверять температуру")
 }
 
-actor Датчики_Температуры as Sensors
-
-User --> TempMonitoring : Просмотр температуры
-User --> HeatingControl : Управление отоплением
+ContainerDb(db, "База данных", "PostgreSQL", "База данных продукта", $sprite="pgsql_server")
 
 
-Sensors --> Application : Отправка данных температуры
-
-HeatingControl <--> DB : Хранение данных о температуре и настройках
-TempMonitoring --> DB : Чтение данных
+Rel(user, HeatingControlMonolyte,"Отправка команд")
+Rel_R(iot, HeatingControlMonolyte,"Получение данных")
+Rel(HeatingControlMonolyte, db, "Чтение и запись в бд")
 
 @enduml
 ```
@@ -51,7 +44,3 @@ TempMonitoring --> DB : Чтение данных
 Управление отоплением – компонент, который отвечает за включение/выключение отопления и регулирование температуры.
 Мониторинг температуры – компонент, который собирает данные с датчиков и предоставляет их пользователю.
 PostgreSQL База данных – хранит данные о температуре и пользовательских настройках отопления.
-Объяснение:
-Пользователь может взаимодействовать с приложением для управления отоплением или для мониторинга температуры.
-Датчики температуры передают данные в приложение.
-Все данные сохраняются в базе данных PostgreSQL, которая взаимодействует с монолитным приложением.

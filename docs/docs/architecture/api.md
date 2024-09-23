@@ -4,7 +4,7 @@
 ## 2. Проектирование API для микросервиса «Управление устройствами»
 ### 1. Получение информации об устройстве
 
-- Эндпойнт: api/v1/devices/{id}
+- Эндпойнт: api/v1/devices/{id:long}
 - Метод: GET
 - Описание: Возвращает подробную информацию о конкретном устройстве по его ID.
 
@@ -18,11 +18,11 @@ GET api/v1/devices/1
 
 ```json
 {
-"id": "12345",
+"id": 1,
 "type": "thermostat",
-"serial_number": "ABC12345",
+"serial_number": "ABC1",
 "status": "active",
-"house_id": "67890",
+"house_id": 67890,
 "created_at": "2023-09-01T10:00:00Z"
 }
 ```
@@ -34,192 +34,177 @@ GET api/v1/devices/1
 
 ### 2. Обновление состояния устройства
 
-- Эндпойнт: api/v1/devices/{id}/status
+- Эндпойнт: api/v1/devices/{id:long}/status
 - Метод: PUT
 - Описание: Позволяет изменить состояние устройства (например, включить/выключить).
 
 Пример запроса:
 
 ```bash
-PUT /devices/1/status
+PUT api/v1/devices/1/status
 ```
 Тело запроса:
 
-json
-Копировать код
+```json
 {
 "status": "off"
 }
+```
 Пример ответа:
 
-json
-Копировать код
+```json
 {
-"id": "12345",
+"id": 12345,
 "status": "off",
 "updated_at": "2023-09-20T12:30:00Z"
 }
+```
 Коды ответа:
 
-200 — Успех
-404 — Устройство не найдено
-500 — Ошибка сервера
-3. Отправка команды устройству
+- 200 — Успех
+- 404 — Устройство не найдено
+- 500 — Ошибка сервера
 
-Эндпойнт: /devices/{device_id}/commands
-Метод: POST
-Описание: Отправляет команду устройству (например, установить температуру).
+### 3. Отправка команды устройству
+
+- Эндпойнт: api/v1/devices/{id:long}/commands
+- Метод: POST
+- Описание: Отправляет команду устройству (например, установить температуру).
 Пример запроса:
 
-bash
-Копировать код
-POST /devices/12345/commands
+```bash
+POST /devices/{id:long}/commands
+```
 Тело запроса:
 
-json
-Копировать код
+```json
 {
 "command": "set_temperature",
 "value": 22
 }
+```
 Пример ответа:
 
-json
-Копировать код
-{
-"id": "12345",
-"command": "set_temperature",
-"value": 22,
-"status": "success"
-}
+Swagger Response Status 200
+
 Коды ответа:
 
-200 — Команда успешно отправлена
-400 — Неверный формат команды
-404 — Устройство не найдено
-500 — Ошибка сервера
-3. Проектирование API для микросервиса «Телеметрия»
-1. Получение последних данных телеметрии
+- 200 — Команда успешно отправлена
+- 400 — Неверный формат команды
+- 404 — Устройство не найдено
+- 500 — Ошибка сервера
+## 3. Проектирование API для микросервиса «Телеметрия»
+### 1. Получение последних данных телеметрии
 
-Эндпойнт: /devices/{device_id}/telemetry/latest
+Эндпойнт: api/v1/devices/{device_id:long}/telemetry/latest
 Метод: GET
 Описание: Возвращает последнее полученное значение телеметрии для устройства.
 Пример запроса:
 
-bash
-Копировать код
-GET /devices/12345/telemetry/latest
+```bash
+GET api/v1/devices/1/telemetry/latest
+```
 Пример ответа:
 
-json
-Копировать код
+```json
 {
-"device_id": "12345",
+"device_id": 1,
 "temperature": 21.5,
 "timestamp": "2023-09-20T12:30:00Z"
 }
+```
 Коды ответа:
 
-200 — Успех
-404 — Данные телеметрии не найдены
-500 — Ошибка сервера
-2. Получение исторических данных телеметрии
+- 200 — Успех
+- 404 — Данные телеметрии не найдены
+- 500 — Ошибка сервера
+### 2. Получение исторических данных телеметрии
 
-Эндпойнт: /devices/{device_id}/telemetry
+Эндпойнт: api/v1/devices/{device_id:long}/telemetry
 Метод: GET
 Описание: Возвращает исторические данные телеметрии для устройства за определённый период времени.
 Пример запроса:
 
-sql
-Копировать код
-GET /devices/12345/telemetry?start=2023-09-19T00:00:00Z&end=2023-09-20T00:00:00Z
+```bash
+GET api/v1/devices/1/telemetry?start=2023-09-19T00:00:00Z&end=2023-09-20T00:00:00Z
+```
 Пример ответа:
 
-json
-Копировать код
+```json
 [
 {
-"device_id": "12345",
+"device_id": 1,
 "temperature": 22.1,
 "timestamp": "2023-09-19T10:00:00Z"
 },
 {
-"device_id": "12345",
+"device_id": 2,
 "temperature": 21.5,
 "timestamp": "2023-09-19T12:00:00Z"
 }
 ]
+```
 Коды ответа:
 
-200 — Успех
-400 — Неверные параметры запроса
-404 — Данные телеметрии не найдены
-500 — Ошибка сервера
-4. Асинхронное взаимодействие через Kafka (AsyncAPI)
-   Когда устройство передает новые данные телеметрии, используется асинхронная шина сообщений Kafka. Например, микросервис «Телеметрия» публикует данные телеметрии, а другие микросервисы могут подписываться на эти события.
+- 200 — Успех
+- 400 — Неверные параметры запроса
+- 404 — Данные телеметрии не найдены
+- 500 — Ошибка сервера
 
+## 4. Асинхронное взаимодействие через Kafka (AsyncAPI)
 Топик: telemetry-data
 Описание события: Передача новых данных телеметрии.
-Пример события:
 
-json
-Копировать код
+```json
 {
-"device_id": "12345",
-"module_id": "56789",
+"device_id": 1,
+"module_id": 231245,
 "temperature": 21.7,
 "timestamp": "2023-09-20T12:45:00Z"
 }
-Контракт события (AsyncAPI):
+```
 
-Публикация данных телеметрии отправляется на топик telemetry-data.
-Подписчики получают уведомления о новых данных в реальном времени.
-5. Документирование API с использованием Swagger/OpenAPI
-   Для REST API мы можем создать интерактивную документацию с помощью Swagger. Пример описания для эндпойнта получения информации об устройстве:
+## 5. Документирование API с использованием Swagger/OpenAPI
 
-yaml
-Копировать код
+```yaml
 openapi: 3.0.0
 info:
-title: Device Management API
-version: 1.0.0
+   title: Device Management API
+   version: 1.0.0
 paths:
-/devices/{device_id}:
-get:
-summary: Get device information
-parameters:
-- name: device_id
-in: path
-required: true
-schema:
-type: string
-description: ID of the device
-responses:
-'200':
-description: Success
-content:
-application/json:
-schema:
-type: object
-properties:
-id:
-type: string
-type:
-type: string
-serial_number:
-type: string
-status:
-type: string
-house_id:
-type: string
-created_at:
-type: string
-format: date-time
-'404':
-description: Device not found
-'500':
-description: Server error
-6. Роль API Gateway
-   API Gateway будет выступать в качестве единой точки входа для всех запросов к микросервисам. Он управляет маршрутизацией запросов к нужным микросервисам (например, запросы к микросервису «Управление устройствами» или «Телеметрия»).
-   Для синхронного взаимодействия (например, управление устройствами) через REST API запросы проходят через Gateway.
-   Для асинхронного взаимодействия (например, получение телеметрии в реальном времени) используется Kafka, который обрабатывает обмен событиями между микросервисами.
+   '/devices/{id}':
+      get:
+         summary: Get device information
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: number
+              description: ID of the device
+         responses:
+            '200':
+               description: Success
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           id:
+                              type: number
+                           type:
+                              type: string
+                           serial_number:
+                              type: string
+                           status:
+                              type: string
+                           house_id:
+                              type: number
+                           created_at:
+                              type: string
+                              format: date-time
+            '404':
+               description: Device not found
+            '500':
+               description: Server error
+```

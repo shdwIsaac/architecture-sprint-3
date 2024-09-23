@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Api - FitLife Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Api";
+        var mkdocs_page_input_path = "architecture\\api.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> FitLife Documentation
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Welcome to MkDocs</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Architecture</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Api</a>
+    <ul class="current">
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../er/">Er</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../microservice/">Microservice</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../monolyte/">Monolyte</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">FitLife Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Architecture</li>
+      <li class="breadcrumb-item active">Api</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="1-api">1. Выбор типов API</h2>
+<p>REST API: Подходит для получения информации о состоянии устройства и управлении устройствами. Например, синхронные запросы для включения/выключения устройства или получения последних данных телеметрии.
+   AsyncAPI (Kafka): Используем для асинхронного взаимодействия, когда данные телеметрии передаются через шину сообщений в реальном времени, например, для передачи новых измерений температуры.</p>
+<h2 id="2-api">2. Проектирование API для микросервиса «Управление устройствами»</h2>
+<h3 id="1">1. Получение информации об устройстве</h3>
+<ul>
+<li>Эндпойнт: api/v1/devices/{id:long}</li>
+<li>Метод: GET</li>
+<li>Описание: Возвращает подробную информацию о конкретном устройстве по его ID.</li>
+</ul>
+<p>Пример запроса:</p>
+<pre><code class="language-bash">GET api/v1/devices/1
+</code></pre>
+<p>Пример ответа:</p>
+<pre><code class="language-json">{
+&quot;id&quot;: 1,
+&quot;type&quot;: &quot;thermostat&quot;,
+&quot;serial_number&quot;: &quot;ABC1&quot;,
+&quot;status&quot;: &quot;active&quot;,
+&quot;house_id&quot;: 67890,
+&quot;created_at&quot;: &quot;2023-09-01T10:00:00Z&quot;
+}
+</code></pre>
+<p>Коды ответа:</p>
+<ul>
+<li>200 — Успех</li>
+<li>404 — Устройство не найдено</li>
+<li>500 — Ошибка сервера</li>
+</ul>
+<h3 id="2">2. Обновление состояния устройства</h3>
+<ul>
+<li>Эндпойнт: api/v1/devices/{id:long}/status</li>
+<li>Метод: PUT</li>
+<li>Описание: Позволяет изменить состояние устройства (например, включить/выключить).</li>
+</ul>
+<p>Пример запроса:</p>
+<pre><code class="language-bash">PUT api/v1/devices/1/status
+</code></pre>
+<p>Тело запроса:</p>
+<pre><code class="language-json">{
+&quot;status&quot;: &quot;off&quot;
+}
+</code></pre>
+<p>Пример ответа:</p>
+<pre><code class="language-json">{
+&quot;id&quot;: 12345,
+&quot;status&quot;: &quot;off&quot;,
+&quot;updated_at&quot;: &quot;2023-09-20T12:30:00Z&quot;
+}
+</code></pre>
+<p>Коды ответа:</p>
+<ul>
+<li>200 — Успех</li>
+<li>404 — Устройство не найдено</li>
+<li>500 — Ошибка сервера</li>
+</ul>
+<h3 id="3">3. Отправка команды устройству</h3>
+<ul>
+<li>Эндпойнт: api/v1/devices/{id:long}/commands</li>
+<li>Метод: POST</li>
+<li>Описание: Отправляет команду устройству (например, установить температуру).
+Пример запроса:</li>
+</ul>
+<pre><code class="language-bash">POST /devices/{id:long}/commands
+</code></pre>
+<p>Тело запроса:</p>
+<pre><code class="language-json">{
+&quot;command&quot;: &quot;set_temperature&quot;,
+&quot;value&quot;: 22
+}
+</code></pre>
+<p>Пример ответа:</p>
+<p>Swagger Response Status 200</p>
+<p>Коды ответа:</p>
+<ul>
+<li>200 — Команда успешно отправлена</li>
+<li>400 — Неверный формат команды</li>
+<li>404 — Устройство не найдено</li>
+<li>500 — Ошибка сервера</li>
+</ul>
+<h2 id="3-api">3. Проектирование API для микросервиса «Телеметрия»</h2>
+<h3 id="1_1">1. Получение последних данных телеметрии</h3>
+<p>Эндпойнт: api/v1/devices/{device_id:long}/telemetry/latest
+Метод: GET
+Описание: Возвращает последнее полученное значение телеметрии для устройства.
+Пример запроса:</p>
+<pre><code class="language-bash">GET api/v1/devices/1/telemetry/latest
+</code></pre>
+<p>Пример ответа:</p>
+<pre><code class="language-json">{
+&quot;device_id&quot;: 1,
+&quot;temperature&quot;: 21.5,
+&quot;timestamp&quot;: &quot;2023-09-20T12:30:00Z&quot;
+}
+</code></pre>
+<p>Коды ответа:</p>
+<ul>
+<li>200 — Успех</li>
+<li>404 — Данные телеметрии не найдены</li>
+<li>500 — Ошибка сервера</li>
+</ul>
+<h3 id="2_1">2. Получение исторических данных телеметрии</h3>
+<p>Эндпойнт: api/v1/devices/{device_id:long}/telemetry
+Метод: GET
+Описание: Возвращает исторические данные телеметрии для устройства за определённый период времени.
+Пример запроса:</p>
+<pre><code class="language-bash">GET api/v1/devices/1/telemetry?start=2023-09-19T00:00:00Z&amp;end=2023-09-20T00:00:00Z
+</code></pre>
+<p>Пример ответа:</p>
+<pre><code class="language-json">[
+{
+&quot;device_id&quot;: 1,
+&quot;temperature&quot;: 22.1,
+&quot;timestamp&quot;: &quot;2023-09-19T10:00:00Z&quot;
+},
+{
+&quot;device_id&quot;: 2,
+&quot;temperature&quot;: 21.5,
+&quot;timestamp&quot;: &quot;2023-09-19T12:00:00Z&quot;
+}
+]
+</code></pre>
+<p>Коды ответа:</p>
+<ul>
+<li>200 — Успех</li>
+<li>400 — Неверные параметры запроса</li>
+<li>404 — Данные телеметрии не найдены</li>
+<li>500 — Ошибка сервера</li>
+</ul>
+<h2 id="4-kafka-asyncapi">4. Асинхронное взаимодействие через Kafka (AsyncAPI)</h2>
+<p>Топик: telemetry-data
+Описание события: Передача новых данных телеметрии.</p>
+<pre><code class="language-json">{
+&quot;device_id&quot;: 1,
+&quot;module_id&quot;: 231245,
+&quot;temperature&quot;: 21.7,
+&quot;timestamp&quot;: &quot;2023-09-20T12:45:00Z&quot;
+}
+</code></pre>
+<h2 id="5-api-swaggeropenapi">5. Документирование API с использованием Swagger/OpenAPI</h2>
+<pre><code class="language-yaml">openapi: 3.0.0
+info:
+   title: Device Management API
+   version: 1.0.0
+paths:
+   '/devices/{id}':
+      get:
+         summary: Get device information
+         parameters:
+            - name: id
+              in: path
+              required: true
+              schema:
+                 type: number
+              description: ID of the device
+         responses:
+            '200':
+               description: Success
+               content:
+                  application/json:
+                     schema:
+                        type: object
+                        properties:
+                           id:
+                              type: number
+                           type:
+                              type: string
+                           serial_number:
+                              type: string
+                           status:
+                              type: string
+                           house_id:
+                              type: number
+                           created_at:
+                              type: string
+                              format: date-time
+            '404':
+               description: Device not found
+            '500':
+               description: Server error
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../.." class="btn btn-neutral float-left" title="Welcome to MkDocs"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../er/" class="btn btn-neutral float-right" title="Er">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../.." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../er/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
