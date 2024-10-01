@@ -76,6 +76,14 @@ minikube delete
 # Задание 1 
 Смотреть через MkDocs. Установить плагины из уроков.
 
+Через терминал
+```bash
+cd docs
+mkdocs build
+mkdocs serve
+```
+
+
 # Задание 2.1
 
 https://github.com/shdwIsaac/DeviceService

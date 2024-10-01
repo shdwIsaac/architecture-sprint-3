@@ -1,7 +1,9 @@
 ## 1. Декомпозиция на микросервисы
 * User Service (Сервис Пользователей) Аутентификация и авторизация пользователей. Управление учетными записями пользователей и настройками.
-* Heating Control Service (Сервис Управления Отоплением) Управление устройствами отопления (включение/выключение, установка температуры).
+* Heating Service (Сервис Управления Отоплением) Управление устройствами отопления (включение/выключение, установка температуры).
 Обработка команд пользователей и отправка их на устройства.
+* Light Service (Сервис Управления Светом) Управление источниками освещений
+* Curtains Service (Сервис Управления Шторами) Управление датчиками штор
 * Temperature Monitoring Service (Сервис Мониторинга Температуры)
 Получение данных с датчиков температуры.
 Хранение и предоставление данных пользователям для мониторинга текущей температуры.
@@ -40,6 +42,9 @@ Container(UserService,"Сервис пользователей")
 Container(HeatingService,"Управление отоплением")
 Container(TempService,"Мониторинг температуры")
 Container(DeviceService,"Управление устройствами")
+Container(ScenarioService,"Сервис сценариев")
+Container(LightService,"Управление Светом")
+Container(CurtainsService,"Управление шторами")
 Container(NotificationService,"Сервис уведомлений")
 
 ContainerQueue(Kafka,"Kafka")
@@ -55,13 +60,22 @@ Rel(APIGateway, UserService, "Запросы")
 Rel(APIGateway, HeatingService, "Запросы")
 Rel(APIGateway, TempService, "Запросы")
 Rel(APIGateway, DeviceService, "Запросы")
+Rel(APIGateway, LightService, "Запросы")
+Rel(APIGateway, ScenarioService, "Запросы")
 
 Rel(UserService, UserDB, "CRUD Операции")
 Rel(DeviceService, DeviceDB, "CRUD Операции")
 Rel(HeatingService, DeviceService, "Команды управления устройствами")
+Rel(LightService, DeviceService, "Команды управления устройствами")
+Rel(CurtainsService, DeviceService, "Команды управления устройствами")
 Rel(TempService, TempDB, "Хранение данных о температуре")
 Rel(TempService, Kafka, "Публикация данных о температуре")
+Rel(ScenarioService, HeatingService, "Отправка команд")
+Rel(ScenarioService, LightService, "Отправка команд")
+Rel(ScenarioService, CurtainsService, "Отправка команд")
 Rel(HeatingService, Kafka, "Подписка на обновления температуры")
+Rel(LightService, Kafka, "Подписка на обновления источников света")
+Rel(CurtainsService, Kafka, "Подписка на обновления положения штор")
 Rel(Kafka,NotificationService, "Отправка уведомлений")
 
 @enduml
@@ -69,12 +83,12 @@ Rel(Kafka,NotificationService, "Отправка уведомлений")
 
 ### C4 — Уровень компонентов (Components)
 
-Heating Control Service. Этот сервис управляет устройствами отопления и взаимодействует с другими микросервисами через Kafka.
+Heating Service. Этот сервис управляет устройствами отопления и взаимодействует с другими микросервисами через Kafka.
 ```puml
 @startuml
 !define RECTANGLE "rect"
 
-title C4 Diagram - Component Level (Heating Control Service)
+title C4 Diagram - Component Level (Heating Service)
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
@@ -82,12 +96,12 @@ title C4 Diagram - Component Level (Heating Control Service)
 
 Person(user, "Пользователь", "Пользователь сервиса")
 
-Container_Boundary(HeatingControlService, "Сервис управление отоплением") {
-  Container(HeatingAPI, "API", "")
-  Container(CommandProcessor, "Метод обработки", "")
-  Container(DeviceClient, "Клиент сервиса устройств", "")
-  Container(KafkaProducer, "Продьюсер в кафку", "")
-  Container(HeatingDB, "DbLink в базу данных", "")
+Container_Boundary(HeatingService, "Сервис управление отоплением") {
+  Component(HeatingAPI, "API", "")
+  Component(CommandProcessor, "Метод обработки", "")
+  Component(DeviceClient, "Клиент сервиса устройств", "")
+  Component(KafkaProducer, "Продьюсер в кафку", "")
+  Component(HeatingDB, "DbLink в базу данных", "")
 }
 
 Rel_D(user, HeatingAPI, "Команды управления отоплением")
@@ -100,7 +114,7 @@ Rel(CommandProcessor, HeatingDB, "Обновление состояния уст
 ```
 ### C4 — Уровень кода (Code)
 
-Command Processor в микросервисе Heating Control Service.
+Command Processor в микросервисе Heating Service.
 
 ```puml
 @startuml
