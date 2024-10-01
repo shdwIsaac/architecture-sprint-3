@@ -26,9 +26,9 @@ Kafka: Используется для передачи событий межд�
 
 title C4 Diagram - Container Level (Microservices Architecture)
 
-!include C4_Component.puml
-!include C4_Context.puml
-!include C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 title System Context Diagram - Управление отоплением
 
@@ -76,9 +76,9 @@ Heating Control Service. Этот сервис управляет устройс
 
 title C4 Diagram - Component Level (Heating Control Service)
 
-!include C4_Component.puml
-!include C4_Context.puml
-!include C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 Person(user, "Пользователь", "Пользователь сервиса")
 
@@ -105,9 +105,9 @@ Command Processor в микросервисе Heating Control Service.
 ```puml
 @startuml
 
-!include C4_Component.puml
-!include C4_Context.puml
-!include C4_Container.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 class CommandProcessor {
 +processCommand(command: HeatingCommand)
