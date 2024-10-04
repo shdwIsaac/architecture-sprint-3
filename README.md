@@ -81,6 +81,8 @@ curl localhost:8080/hello
 minikube delete
 ```
 
+Картинки отоброжаются только в IDE JetBrains 
+
 ![img.png](img.png)
 
 # Задание 1 
