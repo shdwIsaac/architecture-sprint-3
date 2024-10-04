@@ -1,9 +1,9 @@
 ## 1. Декомпозиция на микросервисы
-   Основываясь на функциональных блоках и доменах, определенных ранее (управление отоплением, мониторинг температуры), предлагаем следующую структуру микросервисов:
-
 * User Service (Сервис Пользователей) Аутентификация и авторизация пользователей. Управление учетными записями пользователей и настройками.
-* Heating Control Service (Сервис Управления Отоплением) Управление устройствами отопления (включение/выключение, установка температуры).
+* Heating Service (Сервис Управления Отоплением) Управление устройствами отопления (включение/выключение, установка температуры).
 Обработка команд пользователей и отправка их на устройства.
+* Light Service (Сервис Управления Светом) Управление источниками освещений
+* Curtains Service (Сервис Управления Шторами) Управление датчиками штор
 * Temperature Monitoring Service (Сервис Мониторинга Температуры)
 Получение данных с датчиков температуры.
 Хранение и предоставление данных пользователям для мониторинга текущей температуры.
@@ -13,22 +13,14 @@
 Отправка уведомлений пользователям (например, о выходе температуры за заданные рамки).
 * API Gateway
 Центральная точка доступа для всех внешних запросов.
-Обеспечивает маршрутизацию запросов к нужным микросервисам и безопасность.
 * Message Broker (Kafka)
-Используется для асинхронного взаимодействия микросервисов, передачи сообщений между сервисами, например, уведомления о температурных событиях.
-PostgreSQL База данных
-Хранение данных пользователей, настроек устройств, журналов температуры.
+Используем для асинхронного взаимодействия микросервисов, передачи сообщений между сервисами.
 ## 2. Определение взаимодействия
-   Основное взаимодействие между микросервисами будет происходить через следующие компоненты:
-
 API Gateway: Обрабатывает внешние запросы и маршрутизирует их в нужные микросервисы.
 Kafka: Используется для передачи событий между микросервисами (например, события изменения температуры или обновления состояния устройств).
 База данных: Каждая служба работает с отдельной базой данных (паттерн базы данных на микросервис), однако Kafka будет использоваться для синхронизации между микросервисами.
 ## 3. Визуализация архитектуры
    C4 — Уровень контейнеров (Containers)
-
-Создадим диаграмму контейнеров, которая отображает, как микросервисы взаимодействуют с внешними системами и друг с другом.
-
 ```puml
 @startuml
 !define RECTANGLE "rect"
@@ -36,88 +28,110 @@ Kafka: Используется для передачи событий межд�
 
 title C4 Diagram - Container Level (Microservices Architecture)
 
-actor Пользователь as User
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
-rectangle "API Gateway" as APIGateway {
-[User Service] as UserService
-[Heating Control Service] as HeatingService
-[Temperature Monitoring Service] as TempService
-[Device Management Service] as DeviceService
-[Notification Service] as NotificationService
-}
+title System Context Diagram - Управление отоплением
 
-cloud "Kafka" as Kafka
+Person(user, "Пользователь", "Пользователь системы")
+Person(iot, "Датчики", "Умные устройства", $sprite="robots")
 
-database "PostgreSQL БД Пользователей" as UserDB
-database "PostgreSQL БД Устройств" as DeviceDB
-database "PostgreSQL БД Температуры" as TempDB
+Container(APIGateway,"Шлюз+Hub")
+Container(UserService,"Сервис пользователей")
+Container(TempService,"Мониторинг датчиков")
+Container(DeviceService,"Управление устройствами")
+Container(ScenarioService,"Сервис сценариев")
+Container(NotificationService,"Сервис уведомлений")
+Container_Ext(NotificationExt,"Сервис уведомлений")
+Container(app,"Приложение управление устройствами")
 
-User --> APIGateway : HTTP Запросы
+ContainerQueue(Kafka,"Kafka")
 
-APIGateway --> UserService : Маршрутизация к сервису пользователей
-APIGateway --> HeatingService : Управление отоплением
-APIGateway --> TempService : Мониторинг температуры
-APIGateway --> DeviceService : Управление устройствами
-APIGateway --> NotificationService : Уведомления
+ContainerDb(UserDB, "База данных", "PostgreSQL", "PostgreSQL БД Пользователей", $sprite="pgsql_server")
+ContainerDb(DeviceDB, "База данных", "PostgreSQL", "БД Устройств", $sprite="pgsql_server")
+ContainerDb(ScenarioDB, "База данных + Quartz", "PostgreSQL", "БД Температуры", $sprite="pgsql_server")
+ContainerDb(TempDB, "База данных", "PostgreSQL", "БД Температуры", $sprite="pgsql_server")
+Rel(app, APIGateway, "Запросы")
+Rel(iot, APIGateway, "Запросы")
+Rel(APIGateway, iot, "Запросы")
+Rel(APIGateway, app, "Запросы")
 
-UserService --> UserDB : CRUD Операции
-HeatingService --> DeviceDB : Команды управления устройствами
-TempService --> TempDB : Хранение данных о температуре
+Rel(APIGateway, UserService, "Запросы")
+Rel(APIGateway, DeviceService, "Запросы")
+Rel(APIGateway, ScenarioService, "Запросы")
+Rel(APIGateway, TempService, "Запросы")
 
-TempService --> Kafka : Публикация данных о температуре
-HeatingService --> Kafka : Подписка на обновления температуры
-
-NotificationService --> Kafka : Публикация событий уведомлений
+Rel(UserService, UserDB, "CRUD Операции")
+Rel(DeviceService, DeviceDB, "CRUD Операции + Хранение данных о датчиках")
+Rel(ScenarioService, DeviceService, "Управление")
+Rel(ScenarioService, ScenarioDB, "CRUD Операции")
+Rel(TempService, TempDB, "Хранение данных о температуре")
+Rel(TempService, Kafka, "Публикация данных о температуре")
+Rel(DeviceService, Kafka, "Публикация данных о датчиках")
+Rel(DeviceService, APIGateway, "Отправка команд")
+Rel(Kafka,NotificationService, "Отправка уведомлений")
+Rel(NotificationService,NotificationExt, "Отправка уведомлений")
+Rel(NotificationExt,app, "Отправка уведомлений")
+Rel(user,app, "Просмотр и управление")
 
 @enduml
 ```
 
 ### C4 — Уровень компонентов (Components)
 
-На уровне компонентов детализируем, как организован один из ключевых микросервисов, например, Heating Control Service. Этот сервис управляет устройствами отопления и взаимодействует с другими микросервисами через Kafka.
+Heating Service. Этот сервис управляет устройствами отопления и взаимодействует с другими микросервисами через Kafka.
 ```puml
 @startuml
 !define RECTANGLE "rect"
 
-title C4 Diagram - Component Level (Heating Control Service)
+title C4 Diagram - Component Level (Device Service)
 
-package "Heating Control Service" {
-[API] as HeatingAPI
-[Command Processor] as CommandProcessor
-[Device Manager] as DeviceManager
-[Kafka Producer] as KafkaProducer
-[Database Connector] as HeatingDB
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+Person(user, "Пользователь", "Пользователь сервиса")
+
+Container_Boundary(HeatingService, "Сервис управление устройствами") {
+  Component(HeatingAPI, "API", "")
+  Component(CommandProcessor, "Метод обработки", "")
+  Component(DeviceClient, "Клиент сервиса устройств", "")
+  Component(KafkaProducer, "Продьюсер в кафку", "")
+  Component(HeatingDB, "DbLink в базу данных", "")
 }
 
-actor Пользователь as User
-
-User --> HeatingAPI : Команды управления отоплением
-HeatingAPI --> CommandProcessor : Обработка команд
-CommandProcessor --> DeviceManager : Управление устройствами
-CommandProcessor --> KafkaProducer : Публикация событий в Kafka
-CommandProcessor --> HeatingDB : Обновление состояния устройств
+Rel_D(user, HeatingAPI, "Команды управления")
+Rel(HeatingAPI, CommandProcessor, "Обработка команд")
+Rel(CommandProcessor, DeviceClient, "Вызов API для устройств")
+Rel(CommandProcessor, KafkaProducer, "Публикация событий в Kafka")
+Rel(CommandProcessor, HeatingDB, "Обновление состояния устройств")
 
 @enduml
 ```
 ### C4 — Уровень кода (Code)
 
-На уровне кода можно показать, как реализован, например, Command Processor в микросервисе Heating Control Service. Ниже приведена упрощенная UML-диаграмма классов.
+Command Processor в микросервисе Heating Service.
 
 ```puml
 @startuml
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
 
 class CommandProcessor {
 +processCommand(command: HeatingCommand)
 }
 
 class HeatingCommand {
-+deviceId: String
++id: long
 +temperature: Double
 +execute()
 }
 
-class DeviceManager {
-+setTemperature(deviceId: String, temperature: Double)
+class DeviceClient {
++setTemperature(id: long, temperature: Double)
 }
 
 class KafkaProducer {
@@ -125,7 +139,7 @@ class KafkaProducer {
 }
 
 CommandProcessor --> HeatingCommand
-CommandProcessor --> DeviceManager
+CommandProcessor --> DeviceClient
 CommandProcessor --> KafkaProducer
 
 @enduml

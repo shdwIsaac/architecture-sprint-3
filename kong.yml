@@ -1,0 +1,8 @@
+﻿_format_version: "2.1"
+services:
+  - name: device-manager-service
+    url: http://device-manager:8080/devices
+    routes:
+      - name: heating-route
+        paths:
+          - /api/heating
