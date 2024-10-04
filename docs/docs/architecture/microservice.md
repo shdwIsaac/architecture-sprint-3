@@ -37,46 +37,43 @@ title System Context Diagram - Управление отоплением
 Person(user, "Пользователь", "Пользователь системы")
 Person(iot, "Датчики", "Умные устройства", $sprite="robots")
 
-Container(APIGateway,"Шлюз")
+Container(APIGateway,"Шлюз+Hub")
 Container(UserService,"Сервис пользователей")
-Container(HeatingService,"Управление отоплением")
-Container(TempService,"Мониторинг температуры")
+Container(TempService,"Мониторинг датчиков")
 Container(DeviceService,"Управление устройствами")
 Container(ScenarioService,"Сервис сценариев")
-Container(LightService,"Управление Светом")
-Container(CurtainsService,"Управление шторами")
 Container(NotificationService,"Сервис уведомлений")
+Container_Ext(NotificationExt,"Сервис уведомлений")
+Container(app,"Приложение управление устройствами")
 
 ContainerQueue(Kafka,"Kafka")
 
 ContainerDb(UserDB, "База данных", "PostgreSQL", "PostgreSQL БД Пользователей", $sprite="pgsql_server")
 ContainerDb(DeviceDB, "База данных", "PostgreSQL", "БД Устройств", $sprite="pgsql_server")
+ContainerDb(ScenarioDB, "База данных + Quartz", "PostgreSQL", "БД Температуры", $sprite="pgsql_server")
 ContainerDb(TempDB, "База данных", "PostgreSQL", "БД Температуры", $sprite="pgsql_server")
-
-Rel_D(user, APIGateway, "Запросы")
-Rel_D(iot, APIGateway, "Запросы")
+Rel(app, APIGateway, "Запросы")
+Rel(iot, APIGateway, "Запросы")
+Rel(APIGateway, iot, "Запросы")
+Rel(APIGateway, app, "Запросы")
 
 Rel(APIGateway, UserService, "Запросы")
-Rel(APIGateway, HeatingService, "Запросы")
-Rel(APIGateway, TempService, "Запросы")
 Rel(APIGateway, DeviceService, "Запросы")
-Rel(APIGateway, LightService, "Запросы")
 Rel(APIGateway, ScenarioService, "Запросы")
+Rel(APIGateway, TempService, "Запросы")
 
 Rel(UserService, UserDB, "CRUD Операции")
-Rel(DeviceService, DeviceDB, "CRUD Операции")
-Rel(HeatingService, DeviceService, "Команды управления устройствами")
-Rel(LightService, DeviceService, "Команды управления устройствами")
-Rel(CurtainsService, DeviceService, "Команды управления устройствами")
+Rel(DeviceService, DeviceDB, "CRUD Операции + Хранение данных о датчиках")
+Rel(ScenarioService, DeviceService, "Управление")
+Rel(ScenarioService, ScenarioDB, "CRUD Операции")
 Rel(TempService, TempDB, "Хранение данных о температуре")
 Rel(TempService, Kafka, "Публикация данных о температуре")
-Rel(ScenarioService, HeatingService, "Отправка команд")
-Rel(ScenarioService, LightService, "Отправка команд")
-Rel(ScenarioService, CurtainsService, "Отправка команд")
-Rel(HeatingService, Kafka, "Подписка на обновления температуры")
-Rel(LightService, Kafka, "Подписка на обновления источников света")
-Rel(CurtainsService, Kafka, "Подписка на обновления положения штор")
+Rel(DeviceService, Kafka, "Публикация данных о датчиках")
+Rel(DeviceService, APIGateway, "Отправка команд")
 Rel(Kafka,NotificationService, "Отправка уведомлений")
+Rel(NotificationService,NotificationExt, "Отправка уведомлений")
+Rel(NotificationExt,app, "Отправка уведомлений")
+Rel(user,app, "Просмотр и управление")
 
 @enduml
 ```
@@ -88,7 +85,7 @@ Heating Service. Этот сервис управляет устройствам
 @startuml
 !define RECTANGLE "rect"
 
-title C4 Diagram - Component Level (Heating Service)
+title C4 Diagram - Component Level (Device Service)
 
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
 !include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
@@ -96,7 +93,7 @@ title C4 Diagram - Component Level (Heating Service)
 
 Person(user, "Пользователь", "Пользователь сервиса")
 
-Container_Boundary(HeatingService, "Сервис управление отоплением") {
+Container_Boundary(HeatingService, "Сервис управление устройствами") {
   Component(HeatingAPI, "API", "")
   Component(CommandProcessor, "Метод обработки", "")
   Component(DeviceClient, "Клиент сервиса устройств", "")
@@ -104,7 +101,7 @@ Container_Boundary(HeatingService, "Сервис управление отопл
   Component(HeatingDB, "DbLink в базу данных", "")
 }
 
-Rel_D(user, HeatingAPI, "Команды управления отоплением")
+Rel_D(user, HeatingAPI, "Команды управления")
 Rel(HeatingAPI, CommandProcessor, "Обработка команд")
 Rel(CommandProcessor, DeviceClient, "Вызов API для устройств")
 Rel(CommandProcessor, KafkaProducer, "Публикация событий в Kafka")

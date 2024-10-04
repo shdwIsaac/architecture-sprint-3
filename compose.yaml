@@ -1,0 +1,69 @@
+﻿services:
+  app:
+    image: ghcr.io/shdwisaac/architecture-sprint-3:latest
+    container_name: smart-home-monolith
+    ports:
+      - "8080:8080"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgresql:5432/smart_home
+    depends_on:
+      - postgresql
+    networks:
+      - smart_home_net
+    restart: always
+    
+  devicemanager:
+    image: shdwisaac/device-managment-service:1.2
+    container_name: device-manager
+    ports:
+      - "5288:8080"
+    networks:
+      - smart_home_net
+    restart: always
+    
+  telemetryservice:
+    image: shdwisaac/telemetry-service:1.4
+    container_name: telemetry-service
+    ports:
+      - "5289:8080"
+    networks:
+      - smart_home_net
+    restart: always
+
+  postgresql:
+    image: postgres:15.8
+    container_name: smart-home-postgresql
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=smart_home
+    volumes:
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - smart_home_net
+    restart: always
+    
+  kong:
+    image: kong:latest
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+    volumes:
+      - ./kong.yml:/usr/local/kong/declarative/kong.yml
+    ports:
+      - "8000:8000"  # Публичный доступ для клиентов
+      - "8001:8001"  # Admin API
+    networks:
+      - smart_home_net
+
+networks:
+  smart_home_net:
+    driver: bridge
+
+volumes:
+  postgresql_data:
+    driver: local

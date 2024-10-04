@@ -17,7 +17,6 @@ minikube start
 kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --docker-username=<github_username> --docker-password=<github_token> -n default
 ```
 
-
 ## Установка API GW kusk
 
 [Install Kusk CLI](https://docs.kusk.io/getting-started/install-kusk-cli)
@@ -25,7 +24,13 @@ kubectl create secret docker-registry ghcr --docker-server=https://ghcr.io --doc
 ```bash
 kusk cluster install
 ```
+Нужно установить Helm!!! https://helm.sh/docs/intro/install/
 
+choco install kubernetes-helm
+
+cd charts
+cd smart-home-monolith
+helm dependency update
 
 ## Настройка terraform
 
@@ -45,6 +50,9 @@ provider_installation {
   }
 }
 ```
+
+Удалить .terraform.lock.hcl и другие такие файлы что б сделать terraform init а потом уже apply
+
 
 ## Применяем terraform конфигурацию 
 
@@ -73,6 +81,8 @@ curl localhost:8080/hello
 minikube delete
 ```
 
+![img.png](img.png)
+
 # Задание 1 
 Смотреть через MkDocs. Установить плагины из уроков.
 
@@ -86,12 +96,41 @@ mkdocs serve
 
 # Задание 2.1
 
+После развертывания по инструкции выше до задания 1
+
+Пробросить на внешний порт
+kubectl port-forward smart-home-monolith-postgresql-0 5433:5432
+
+подключиться к бд, логин и пароль можно найти в файле values.yaml
+
+Сделал по 1 строке записи в каждой таблице
+
+База данных 
+![img_1.png](img_1.png)
+
+Ответ с монолита
+
+![img_2.png](img_2.png)
+
+на этом этапе переобулся на docker compose
+
+подключение к бд через порт localhost:5433 смотреть кредиты в env 
+
+надо положить в бд какие-нить данные. Можно воспользоваться pgAdmin
+
 https://github.com/shdwIsaac/DeviceService
 https://github.com/shdwIsaac/TelemetryService
 
 Собирать образы через docker build -t <servicename> .
 
-Использовать docker compose в сервисе DeviceService что б развернуть сервисы
+подменить на свои image в файле compose (находится здесь).
+
+docker compose up -d
+
+Пример вызова
+![img_3.png](img_3.png)
+
+![img_4.png](img_4.png)
 
 Для пуша в ContainerRegistry
 
@@ -103,74 +142,11 @@ docker push ghcr.io/<your-github-username>/myservice:latest
 
 # Задание 2.2
 
-docker compose up -d Для кафки файл ниже
+Kong в docker compose
 
-```yaml
-version: '3'
-services:
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "2181:2181"
+http://localhost:8000/api/heating/1
+настройка на этот адрес в kong.yml
 
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-```
-Создание топика
+![img_5.png](img_5.png)
 
-```bash
-docker exec -it kafka /bin/bash
-kafka-topics --create --topic telemetry-data --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
-```
-
-docker compose up -d Для API GATEWAY файл ниже
-
-```yaml
-version: '3'
-services:
-  kong:
-    image: kong:latest
-    environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /kong/kong.yml
-    volumes:
-      - ./kong.yml:/kong/kong.yml
-    ports:
-      - "8000:8000"
-      - "8443:8443"
-      - "8001:8001"
-      - "8444:8444"
-```
-
-настройка
-
-```yaml
-_format_version: "2.1"
-services:
-- name: device-management-service
-  url: http://device-management:8080
-  routes:
-    - name: device
-      paths:
-        - /devices
-- name: telemetry-service
-  url: http://telemetry-management:8080
-  routes:
-    - name: telemetry
-      paths:
-        - /telemetry
-```
-
+![img_6.png](img_6.png)

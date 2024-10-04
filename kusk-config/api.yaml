@@ -1,0 +1,15 @@
+﻿openapi: 3.0.0
+info:
+  title: Smart Home API Gateway
+  description: Gateway для маршрутизации запросов к микросервисам Smart Home.
+  version: "1.0.0"
+paths:
+  /api/heating:
+    get:
+      summary: "Маршрутизация запросов на управление устройствами"
+      x-kusk:
+        upstream:
+          url: http://device-manager:8081/devices
+      responses:
+        '200':
+          description: "Успешный ответ от device-manager"
